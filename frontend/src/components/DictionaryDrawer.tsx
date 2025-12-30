@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef, KeyboardEvent } from 'react'
 import { PlayButton } from './PlayButton'
 import { ToneCurve } from './ToneCurve'
+import { HanziWriterCompact } from './HanziWriter'
 import { lookupWord } from '@/lib/api'
 import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors'
 import { UI } from '@/lib/i18n'
@@ -248,6 +249,21 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
                     )
                   })}
                 </div>
+              </div>
+
+              {/* Stroke Order */}
+              <div className="bg-mao-white border border-mao-black p-4 rounded-none shadow-brutal-sm">
+                <h3 className="text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                  Stroke Order
+                </h3>
+                <div className="flex gap-3 flex-wrap">
+                  {entry.simplified.split('').map((char, i) => (
+                    <HanziWriterCompact key={i} character={char} size={70} />
+                  ))}
+                </div>
+                <p className="mt-3 text-[10px] text-mao-black/40">
+                  Click to replay animation
+                </p>
               </div>
 
               {/* Definitions */}

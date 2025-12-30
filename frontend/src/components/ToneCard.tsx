@@ -21,7 +21,7 @@ export function ToneCard({ word, onDictionaryClick }: ToneCardProps) {
   const freqLabel = UI.frequencyLabels[freqTier] || freqTier
 
   return (
-    <div className="tone-card group">
+    <article className="tone-card group" role="article">
       {/* Header: Characters + Play + badges */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function ToneCard({ word, onDictionaryClick }: ToneCardProps) {
         </svg>
         {UI.viewInDict}
       </button>
-    </div>
+    </article>
   )
 }
 
