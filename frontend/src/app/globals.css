@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Syne:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+/* Base styles */
+:root {
+  --mao-red: #E23D2E;
+  --mao-yellow: #F5C84B;
+  --mao-black: #1B1B1B;
+  --mao-white: #FDFBF7;
+  --mao-cream: #F5EFE6;
+  --toneo-shadow: rgba(27, 27, 27, 0.15);
+}
+
+body {
+  background-color: var(--mao-cream);
+  color: var(--mao-black);
+  font-family: 'Lexend', 'Noto Sans SC', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  line-height: 1.6;
+}
+
+/* Brutalist selection */
+::selection {
+  background-color: var(--mao-yellow);
+  color: var(--mao-black);
+}
+
+/* Brutalist scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mao-cream);
+  border-left: 1px solid var(--mao-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mao-black);
+  border: 1px solid var(--mao-cream);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mao-red);
+}
+
+/* Utility classes */
+@layer components {
+  .page-shell {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .surface-card {
+    @apply rounded-none border border-mao-black bg-mao-white p-6;
+    box-shadow: 4px 4px 0px 0px var(--mao-black);
+  }
+
+  .section-title {
+    @apply text-[10px] font-bold uppercase tracking-[0.25em] text-mao-black/60;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-none border border-mao-black bg-mao-yellow/10 px-2 py-0.5 text-[10px] font-bold uppercase text-mao-black;
+  }
+
+  .brutal-border {
+    @apply border border-mao-black;
+  }
+
+  .brutal-shadow {
+    box-shadow: 4px 4px 0px 0px var(--mao-black);
+  }
+
+  .brutal-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-none px-6 py-3 text-sm font-bold uppercase tracking-wider;
+    @apply bg-mao-red text-mao-white border border-mao-black;
+    @apply hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(27,27,27,1)];
+    @apply active:translate-x-[0px] active:translate-y-[0px] active:shadow-none;
+    @apply transition-all duration-100;
+  }
+
+  .brutal-input {
+    @apply w-full rounded-none border border-mao-black bg-mao-white px-4 py-3 text-mao-black;
+    @apply placeholder:text-mao-black/30;
+    @apply focus:outline-none focus:ring-2 focus:ring-mao-yellow/50;
+    @apply transition-all duration-150;
+  }
+
+  .brutal-card {
+    @apply rounded-none border border-mao-black bg-mao-white p-4;
+    box-shadow: 4px 4px 0px 0px var(--mao-black);
+  }
+
+  .tone-card {
+    @apply rounded-none border border-mao-black bg-mao-white p-5;
+    @apply transition-transform duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(27,27,27,1)];
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .stagger-item {
+    animation: fade-in-up 0.5s ease-out both;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Tone curve animations */
+@keyframes draw-curve {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tone-curve {
+  stroke-dasharray: 100;
+  animation: draw-curve 0.6s ease-out forwards;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .surface-card {
+    @apply p-4;
+  }
+
+  .brutal-input {
+    @apply text-base;
+  }
+
+  /* Stack only main page layout grids on mobile (not component grids) */
+  .main-grid {
+    @apply grid-cols-1;
+  }
+
+  /* Smaller hero text */
+  h2 {
+    @apply text-3xl;
+  }
+
+  /* Full width button */
+  .brutal-button {
+    @apply w-full justify-center;
+  }
+
+  /* Hide decorative elements on mobile */
+  .page-shell::before,
+  .page-shell::after {
+    display: none;
+  }
+}
