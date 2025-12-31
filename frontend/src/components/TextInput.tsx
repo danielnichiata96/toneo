@@ -1,6 +1,7 @@
 'use client'
 
-import { FormEvent, KeyboardEvent } from 'react'
+import { FormEvent, KeyboardEvent, useCallback } from 'react'
+import { PinyinSuggestions } from './PinyinSuggestions'
 import { UI } from '@/lib/i18n'
 
 interface TextInputProps {
@@ -31,6 +32,16 @@ export function TextInput({ value, onChange, onAnalyze, loading = false }: TextI
     }
   }
 
+  // Handle pinyin suggestion selection (block if already loading)
+  const handlePinyinSelect = useCallback(
+    (hanzi: string) => {
+      if (loading) return
+      onChange(hanzi)
+      onAnalyze(hanzi)
+    },
+    [onChange, onAnalyze, loading]
+  )
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Input field */}
@@ -53,6 +64,9 @@ export function TextInput({ value, onChange, onAnalyze, loading = false }: TextI
           </span>
         </div>
       </div>
+
+      {/* Pinyin to Hanzi suggestions */}
+      <PinyinSuggestions text={value} onSelect={handlePinyinSelect} />
 
       {/* Submit button */}
       <button
