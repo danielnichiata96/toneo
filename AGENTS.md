@@ -25,7 +25,7 @@
 
 ## Testing Guidelines
 - Backend tests use `pytest` and `pytest-asyncio`; add tests under `backend/tests` named `test_*.py`.
-- No frontend test runner is configured; if adding tests, document the framework in this file.
+- Frontend tests use Vitest; run `cd frontend && npm run test`.
 - Run backend tests with `cd backend && pytest`.
 
 ## Commit & Pull Request Guidelines

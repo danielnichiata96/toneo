@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
@@ -15,6 +15,32 @@ import { UI } from '@/lib/i18n'
 import type { AnalyzeResponse } from '@/types/tone'
 
 export default function Home() {
+  return (
+    <Suspense fallback={<HomeLoading />}>
+      <HomeContent />
+    </Suspense>
+  )
+}
+
+function HomeLoading() {
+  return (
+    <main className="page-shell min-h-screen">
+      <header className="border-b border-mao-black bg-mao-white">
+        <div className="h-1 bg-mao-red" />
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <Logo size="lg" showTagline />
+        </div>
+      </header>
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-pulse text-mao-black/50 font-bold uppercase tracking-wider">
+          Loading...
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function HomeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { history, addToHistory, clearHistory, removeFromHistory } = useHistory()
