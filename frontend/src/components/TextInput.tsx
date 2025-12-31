@@ -58,16 +58,26 @@ export function TextInput({ value, onChange, onAnalyze, loading = false }: TextI
       <button
         type="submit"
         disabled={loading || !value.trim()}
-        className="brutal-button w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        className="brutal-button w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
       >
-        {loading ? (
-          <span className="flex items-center justify-center gap-2">
-            <LoadingSpinner />
-            {UI.analyzingButton}
-          </span>
-        ) : (
-          <span>{UI.analyzeButton}</span>
-        )}
+        <span aria-hidden="true" className="pointer-events-none opacity-0">
+          {UI.analyzingButton}
+        </span>
+        <span
+          className={`absolute inset-0 flex items-center justify-center gap-2 transition-opacity duration-150 ${
+            loading ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <LoadingSpinner />
+          {UI.analyzingButton}
+        </span>
+        <span
+          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-150 ${
+            loading ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          {UI.analyzeButton}
+        </span>
       </button>
     </form>
   )

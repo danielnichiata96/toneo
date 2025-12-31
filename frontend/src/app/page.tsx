@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 import { TextInput } from '@/components/TextInput'
 import { ToneVisualizer } from '@/components/ToneVisualizer'
 import { QuickExamples } from '@/components/QuickExamples'
@@ -72,10 +73,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-6">
             <div>
-              <p className="section-title mb-1">{UI.appName}</p>
-              <h1 className="text-2xl sm:text-4xl font-display font-bold tracking-tight">
-                {UI.appTagline}
-              </h1>
+              <Logo size="lg" showTagline />
             </div>
             <div className="flex items-center gap-3">
               <Link
@@ -176,7 +174,11 @@ export default function Home() {
       <footer className="border-t border-mao-black bg-mao-white mt-auto">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
+              <Logo size="sm" />
+              <p className="hidden sm:block text-xs font-bold uppercase tracking-wider text-mao-black/30">
+                |
+              </p>
               <p className="text-xs font-bold uppercase tracking-wider text-mao-black/70">
                 {UI.footerBuilt}
               </p>

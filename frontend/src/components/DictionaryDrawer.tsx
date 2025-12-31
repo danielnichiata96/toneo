@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef, KeyboardEvent } from 'react'
 import { PlayButton } from './PlayButton'
 import { ToneCurve } from './ToneCurve'
 import { HanziWriterCompact } from './HanziWriter'
+import { BrushIcon, ToneIcon, DictionaryIcon } from './icons'
 import { lookupWord } from '@/lib/api'
 import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors'
 import { UI } from '@/lib/i18n'
@@ -221,7 +222,8 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
 
               {/* Tone breakdown */}
               <div className="bg-mao-white border border-mao-black p-4 rounded-none shadow-brutal-sm">
-                <h3 className="text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                <h3 className="flex items-center gap-2 text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                  <ToneIcon size={16} />
                   Tone Breakdown
                 </h3>
                 <div className="flex gap-4">
@@ -253,7 +255,8 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
 
               {/* Stroke Order */}
               <div className="bg-mao-white border border-mao-black p-4 rounded-none shadow-brutal-sm">
-                <h3 className="text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                <h3 className="flex items-center gap-2 text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                  <BrushIcon size={16} />
                   Stroke Order
                 </h3>
                 <div className="flex gap-3 flex-wrap">
@@ -268,7 +271,8 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
 
               {/* Definitions */}
               <div>
-                <h3 className="text-xs font-semibold text-mao-black/50 uppercase tracking-wide mb-2">
+                <h3 className="flex items-center gap-2 text-xs font-semibold text-mao-black/50 uppercase tracking-wide mb-2">
+                  <DictionaryIcon size={14} />
                   Definitions
                 </h3>
                 <ul className="space-y-2">

@@ -15,7 +15,7 @@ interface SearchHistoryProps {
  */
 export function SearchHistory({ history, onSelect, onRemove, onClear }: SearchHistoryProps) {
   // Handle Delete key to remove item
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>, text: string) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLLIElement>, text: string) => {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault()
       onRemove(text)

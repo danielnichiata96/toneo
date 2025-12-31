@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 
 export const metadata: Metadata = {
   title: 'About - Toneo',
@@ -14,13 +15,16 @@ export default function AboutPage() {
         <div className="h-1 bg-mao-red" />
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-6">
-            <div>
-              <Link href="/" className="section-title hover:text-mao-red transition-colors">
+            <div className="flex flex-col gap-4">
+              <Link href="/" className="section-title hover:text-mao-red transition-colors flex items-center gap-2">
                 ← Back to Toneo
               </Link>
-              <h1 className="mt-2 text-2xl sm:text-4xl font-display font-bold tracking-tight">
-                About
-              </h1>
+              <div className="flex items-center gap-4">
+                <Logo size="md" showText={false} />
+                <h1 className="text-2xl sm:text-5xl font-display font-black tracking-tighter uppercase leading-none text-mao-black">
+                  About
+                </h1>
+              </div>
             </div>
           </div>
         </div>
@@ -217,19 +221,22 @@ export default function AboutPage() {
       {/* Footer */}
       <footer className="border-t border-mao-black bg-mao-white mt-auto">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-mao-black/50">
-              Dictionary data © CC-CEDICT, licensed under{' '}
-              <a
-                href="https://creativecommons.org/licenses/by-sa/4.0/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-mao-red"
-              >
-                CC BY-SA 4.0
-              </a>
-            </p>
-            <Link href="/" className="text-xs font-bold text-mao-red hover:underline">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-6">
+              <Logo size="sm" />
+              <p className="text-[10px] font-mono text-mao-black/50">
+                Dictionary data ©{' '}
+                <a
+                  href="https://www.mdbg.net/chinese/dictionary?page=cedict"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-mao-red"
+                >
+                  CC-CEDICT
+                </a>
+              </p>
+            </div>
+            <Link href="/" className="text-xs font-bold uppercase tracking-widest text-mao-red hover:translate-x-[-2px] transition-transform">
               ← Back to app
             </Link>
           </div>
