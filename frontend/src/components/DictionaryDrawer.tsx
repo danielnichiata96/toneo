@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef, KeyboardEvent } from 'react'
 import { PlayButton } from './PlayButton'
 import { ToneCurve } from './ToneCurve'
-import { HanziWriter, HanziWriterCompact } from './HanziWriter'
+import { HanziWriterCompact } from './HanziWriter'
 import { BrushIcon, ToneIcon, DictionaryIcon } from './icons'
 import { lookupWord } from '@/lib/api'
 import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors'
@@ -23,8 +23,6 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
   const [entry, setEntry] = useState<DictionaryEntry | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [practiceMode, setPracticeMode] = useState(false)
-  const [practiceCharIndex, setPracticeCharIndex] = useState(0)
   const currentWordRef = useRef<string | null>(null)
   const drawerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -36,10 +34,6 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
       currentWordRef.current = null
       return
     }
-
-    // Reset practice mode when word changes
-    setPracticeMode(false)
-    setPracticeCharIndex(0)
 
     // Track current request to prevent race conditions
     currentWordRef.current = word
@@ -261,69 +255,18 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
 
               {/* Stroke Order */}
               <div className="bg-mao-white border border-mao-black p-4 rounded-none shadow-brutal-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="flex items-center gap-2 text-[10px] font-bold text-mao-black/50 uppercase tracking-widest">
-                    <BrushIcon size={16} />
-                    {practiceMode ? 'Practice Mode' : 'Stroke Order'}
-                  </h3>
-                  <button
-                    onClick={() => setPracticeMode(!practiceMode)}
-                    className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider border border-mao-black transition-colors ${
-                      practiceMode
-                        ? 'bg-mao-red text-mao-white hover:bg-mao-black'
-                        : 'bg-mao-cream hover:bg-mao-yellow'
-                    }`}
-                  >
-                    {practiceMode ? 'Exit Practice' : 'Practice'}
-                  </button>
+                <h3 className="flex items-center gap-2 text-[10px] font-bold text-mao-black/50 uppercase tracking-widest mb-4">
+                  <BrushIcon size={16} />
+                  Stroke Order
+                </h3>
+                <div className="flex gap-3 flex-wrap">
+                  {entry.simplified.split('').map((char, i) => (
+                    <HanziWriterCompact key={i} character={char} size={70} />
+                  ))}
                 </div>
-
-                {practiceMode ? (
-                  /* Practice Mode - Full HanziWriter with controls */
-                  <div className="space-y-4">
-                    {/* Character selector */}
-                    {entry.simplified.length > 1 && (
-                      <div className="flex gap-2 justify-center">
-                        {entry.simplified.split('').map((char, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setPracticeCharIndex(i)}
-                            className={`w-10 h-10 text-xl font-bold border-2 transition-colors ${
-                              i === practiceCharIndex
-                                ? 'border-mao-red bg-mao-red/10 text-mao-red'
-                                : 'border-mao-black/20 hover:border-mao-black'
-                            }`}
-                          >
-                            {char}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {/* Full HanziWriter with quiz */}
-                    <div className="flex justify-center">
-                      <HanziWriter
-                        key={entry.simplified[practiceCharIndex]}
-                        character={entry.simplified[practiceCharIndex]}
-                        size={180}
-                        showGrid={true}
-                        gridType="mi"
-                        enableQuiz={true}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  /* View Mode - Compact display */
-                  <>
-                    <div className="flex gap-3 flex-wrap">
-                      {entry.simplified.split('').map((char, i) => (
-                        <HanziWriterCompact key={i} character={char} size={70} />
-                      ))}
-                    </div>
-                    <p className="mt-3 text-[10px] text-mao-black/40">
-                      Click to replay animation
-                    </p>
-                  </>
-                )}
+                <p className="mt-3 text-[10px] text-mao-black/40">
+                  Click to replay animation
+                </p>
               </div>
 
               {/* Definitions */}

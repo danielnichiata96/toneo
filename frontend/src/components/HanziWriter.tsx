@@ -11,7 +11,6 @@ interface HanziWriterProps {
   gridType?: 'tian' | 'mi'  // 田字格 or 米字格
   strokeColor?: string
   outlineColor?: string
-  enableQuiz?: boolean
   onComplete?: () => void
 }
 
@@ -98,14 +97,11 @@ export function HanziWriter({
   gridType = 'tian',
   strokeColor = '#1B1B1B',
   outlineColor = '#DDD',
-  enableQuiz = true,
   onComplete,
 }: HanziWriterProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const writerRef = useRef<HanziWriterLib | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isQuizzing, setIsQuizzing] = useState(false)
-  const [quizResult, setQuizResult] = useState<'idle' | 'correct' | 'mistake'>('idle')
   const [error, setError] = useState<string | null>(null)
 
   // Initialize HanziWriter
@@ -160,38 +156,14 @@ export function HanziWriter({
   // Show stroke by stroke
   const handleShowStrokes = useCallback(() => {
     if (!writerRef.current) return
-    setIsQuizzing(false)
-    setQuizResult('idle')
     writerRef.current.showCharacter()
   }, [])
 
   // Hide character
   const handleHide = useCallback(() => {
     if (!writerRef.current) return
-    setIsQuizzing(false)
-    setQuizResult('idle')
     writerRef.current.hideCharacter()
   }, [])
-
-  // Start quiz mode
-  const handleQuiz = useCallback(() => {
-    if (!writerRef.current || isPlaying) return
-    setIsQuizzing(true)
-    setQuizResult('idle')
-    writerRef.current.quiz({
-      onMistake: () => {
-        setQuizResult('mistake')
-      },
-      onCorrectStroke: () => {
-        setQuizResult('correct')
-      },
-      onComplete: () => {
-        setIsQuizzing(false)
-        setQuizResult('idle')
-        onComplete?.()
-      },
-    })
-  }, [isPlaying, onComplete])
 
   if (error) {
     return (
@@ -204,20 +176,11 @@ export function HanziWriter({
     )
   }
 
-  // Border color based on quiz result
-  const borderColor = isQuizzing
-    ? quizResult === 'correct'
-      ? 'border-green-500'
-      : quizResult === 'mistake'
-      ? 'border-mao-red'
-      : 'border-mao-yellow'
-    : 'border-mao-black'
-
   return (
     <div className="flex flex-col items-center gap-2">
       {/* Character container with grid */}
       <div
-        className={`relative ${borderColor} border-2 bg-mao-white transition-colors`}
+        className="relative border-2 border-mao-black bg-mao-white"
         style={{ width: size, height: size }}
       >
         {/* Grid background */}
@@ -230,18 +193,11 @@ export function HanziWriter({
         />
       </div>
 
-      {/* Quiz mode indicator */}
-      {isQuizzing && (
-        <p className="text-[10px] font-bold uppercase tracking-wider text-mao-yellow">
-          Draw the strokes!
-        </p>
-      )}
-
       {/* Controls */}
       <div className="flex gap-2 flex-wrap justify-center">
         <button
           onClick={handleAnimate}
-          disabled={isPlaying || isQuizzing}
+          disabled={isPlaying}
           className="px-3 py-1 text-xs font-bold uppercase tracking-wider border border-mao-black bg-mao-cream hover:bg-mao-yellow disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isPlaying ? 'Playing...' : 'Animate'}
@@ -260,15 +216,6 @@ export function HanziWriter({
         >
           Hide
         </button>
-        {enableQuiz && (
-          <button
-            onClick={handleQuiz}
-            disabled={isPlaying || isQuizzing}
-            className="px-3 py-1 text-xs font-bold uppercase tracking-wider border border-mao-black bg-mao-red text-mao-white hover:bg-mao-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isQuizzing ? 'Drawing...' : 'Quiz'}
-          </button>
-        )}
       </div>
     </div>
   )
