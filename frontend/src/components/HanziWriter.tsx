@@ -27,63 +27,58 @@ function GridBackground({
   size: number
   type: 'tian' | 'mi'
 }) {
+  // Use darker lines for better visibility
+  const lineColor = '#CCCCCC'
+  const lineWidth = size < 80 ? 1 : 0.8
+
   return (
     <svg
-      className="absolute inset-0 pointer-events-none"
+      className="absolute inset-0 pointer-events-none z-0"
       width={size}
       height={size}
       viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
     >
-      {/* Outer border */}
-      <rect
-        x="1"
-        y="1"
-        width="98"
-        height="98"
-        fill="none"
-        stroke="#E5E5E5"
-        strokeWidth="1"
-      />
       {/* Vertical center line */}
       <line
         x1="50"
-        y1="5"
+        y1="2"
         x2="50"
-        y2="95"
-        stroke="#E5E5E5"
-        strokeWidth="0.5"
-        strokeDasharray="3,2"
+        y2="98"
+        stroke={lineColor}
+        strokeWidth={lineWidth}
+        strokeDasharray="4,3"
       />
       {/* Horizontal center line */}
       <line
-        x1="5"
+        x1="2"
         y1="50"
-        x2="95"
+        x2="98"
         y2="50"
-        stroke="#E5E5E5"
-        strokeWidth="0.5"
-        strokeDasharray="3,2"
+        stroke={lineColor}
+        strokeWidth={lineWidth}
+        strokeDasharray="4,3"
       />
       {/* Diagonal lines for 米字格 */}
       {type === 'mi' && (
         <>
           <line
-            x1="5"
-            y1="5"
-            x2="95"
-            y2="95"
-            stroke="#E5E5E5"
-            strokeWidth="0.5"
-            strokeDasharray="3,2"
+            x1="2"
+            y1="2"
+            x2="98"
+            y2="98"
+            stroke={lineColor}
+            strokeWidth={lineWidth}
+            strokeDasharray="4,3"
           />
           <line
-            x1="95"
-            y1="5"
-            x2="5"
-            y2="95"
-            stroke="#E5E5E5"
-            strokeWidth="0.5"
-            strokeDasharray="3,2"
+            x1="98"
+            y1="2"
+            x2="2"
+            y2="98"
+            stroke={lineColor}
+            strokeWidth={lineWidth}
+            strokeDasharray="4,3"
           />
         </>
       )}
