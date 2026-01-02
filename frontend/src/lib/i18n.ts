@@ -11,7 +11,7 @@ export const UI = {
 
   // Hero
   heroOverline: 'Speak with confidence',
-  heroTitle: 'Modern tone clarity, built for fast practice.',
+  heroTitle: 'See tones clearly.',
   heroSubtitle: 'Analyze Mandarin tones instantly, spot sandhi changes, and learn with a clean visual map.',
   heroBadges: ['Real-time tone curves', 'Sandhi-aware', 'HSK tags'],
 

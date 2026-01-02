@@ -2,87 +2,23 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import HanziWriterLib from 'hanzi-writer'
+import { GridBackground } from './GridBackground'
+import {
+  HANZI_SIZES,
+  HANZI_COLORS,
+  HANZI_ANIMATION,
+  type GridType,
+} from '@/lib/constants'
 
 interface HanziWriterProps {
   character: string
   size?: number
   showOutline?: boolean
   showGrid?: boolean
-  gridType?: 'tian' | 'mi'  // 田字格 or 米字格
+  gridType?: GridType
   strokeColor?: string
   outlineColor?: string
   onComplete?: () => void
-}
-
-/**
- * Grid background SVG for character practice.
- * 田字格 (tian zi ge) - field character grid (cross pattern)
- * 米字格 (mi zi ge) - rice character grid (cross + diagonals)
- */
-function GridBackground({
-  size,
-  type = 'tian'
-}: {
-  size: number
-  type: 'tian' | 'mi'
-}) {
-  // Use darker lines for better visibility
-  const lineColor = '#CCCCCC'
-  const lineWidth = size < 80 ? 1 : 0.8
-
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none z-0"
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid meet"
-    >
-      {/* Vertical center line */}
-      <line
-        x1="50"
-        y1="2"
-        x2="50"
-        y2="98"
-        stroke={lineColor}
-        strokeWidth={lineWidth}
-        strokeDasharray="4,3"
-      />
-      {/* Horizontal center line */}
-      <line
-        x1="2"
-        y1="50"
-        x2="98"
-        y2="50"
-        stroke={lineColor}
-        strokeWidth={lineWidth}
-        strokeDasharray="4,3"
-      />
-      {/* Diagonal lines for 米字格 */}
-      {type === 'mi' && (
-        <>
-          <line
-            x1="2"
-            y1="2"
-            x2="98"
-            y2="98"
-            stroke={lineColor}
-            strokeWidth={lineWidth}
-            strokeDasharray="4,3"
-          />
-          <line
-            x1="98"
-            y1="2"
-            x2="2"
-            y2="98"
-            stroke={lineColor}
-            strokeWidth={lineWidth}
-            strokeDasharray="4,3"
-          />
-        </>
-      )}
-    </svg>
-  )
 }
 
 /**
@@ -91,12 +27,12 @@ function GridBackground({
  */
 export function HanziWriter({
   character,
-  size = 120,
+  size = HANZI_SIZES.default,
   showOutline = true,
   showGrid = true,
   gridType = 'tian',
-  strokeColor = '#1B1B1B',
-  outlineColor = '#DDD',
+  strokeColor = HANZI_COLORS.stroke,
+  outlineColor = HANZI_COLORS.outline,
   onComplete,
 }: HanziWriterProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -104,11 +40,9 @@ export function HanziWriter({
   const [isPlaying, setIsPlaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Initialize HanziWriter
   useEffect(() => {
     if (!containerRef.current || !character) return
 
-    // Clear previous instance
     containerRef.current.innerHTML = ''
     writerRef.current = null
     setError(null)
@@ -121,9 +55,9 @@ export function HanziWriter({
         showOutline,
         strokeColor,
         outlineColor,
-        strokeAnimationSpeed: 1,
-        delayBetweenStrokes: 300,
-        radicalColor: '#E23D2E',
+        strokeAnimationSpeed: HANZI_ANIMATION.strokeSpeed,
+        delayBetweenStrokes: HANZI_ANIMATION.delayBetweenStrokes,
+        radicalColor: HANZI_COLORS.radical,
         onLoadCharDataError: () => {
           setError('Character not available')
         },
@@ -140,7 +74,6 @@ export function HanziWriter({
     }
   }, [character, size, showOutline, strokeColor, outlineColor])
 
-  // Animate strokes
   const handleAnimate = useCallback(() => {
     if (!writerRef.current || isPlaying) return
 
@@ -153,16 +86,12 @@ export function HanziWriter({
     })
   }, [isPlaying, onComplete])
 
-  // Show stroke by stroke
   const handleShowStrokes = useCallback(() => {
-    if (!writerRef.current) return
-    writerRef.current.showCharacter()
+    writerRef.current?.showCharacter()
   }, [])
 
-  // Hide character
   const handleHide = useCallback(() => {
-    if (!writerRef.current) return
-    writerRef.current.hideCharacter()
+    writerRef.current?.hideCharacter()
   }, [])
 
   if (error) {
@@ -183,9 +112,7 @@ export function HanziWriter({
         className="relative border-2 border-mao-black bg-mao-white"
         style={{ width: size, height: size }}
       >
-        {/* Grid background */}
         {showGrid && <GridBackground size={size} type={gridType} />}
-        {/* HanziWriter canvas */}
         <div
           ref={containerRef}
           className="relative z-10"
@@ -217,77 +144,6 @@ export function HanziWriter({
           Hide
         </button>
       </div>
-    </div>
-  )
-}
-
-/**
- * Compact version for inline use (no controls).
- */
-export function HanziWriterCompact({
-  character,
-  size = 60,
-  showGrid = true,
-}: {
-  character: string
-  size?: number
-  showGrid?: boolean
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const writerRef = useRef<HanziWriterLib | null>(null)
-
-  useEffect(() => {
-    if (!containerRef.current || !character) return
-
-    containerRef.current.innerHTML = ''
-
-    try {
-      writerRef.current = HanziWriterLib.create(containerRef.current, character, {
-        width: size,
-        height: size,
-        padding: 3,
-        showOutline: true,
-        strokeColor: '#1B1B1B',
-        outlineColor: '#E5E5E5',
-        strokeAnimationSpeed: 1.5,
-        delayBetweenStrokes: 200,
-      })
-
-      // Auto-animate on load
-      setTimeout(() => {
-        writerRef.current?.animateCharacter()
-      }, 300)
-    } catch {
-      // Silently fail for compact version
-    }
-
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ''
-      }
-    }
-  }, [character, size])
-
-  // Click to replay
-  const handleClick = () => {
-    writerRef.current?.animateCharacter()
-  }
-
-  return (
-    <div
-      className="relative cursor-pointer border border-mao-black/20 bg-mao-white hover:border-mao-black transition-colors"
-      style={{ width: size, height: size }}
-      title="Click to replay animation"
-      onClick={handleClick}
-    >
-      {/* Grid background */}
-      {showGrid && <GridBackground size={size} type="tian" />}
-      {/* HanziWriter canvas */}
-      <div
-        ref={containerRef}
-        className="relative z-10"
-        style={{ width: size, height: size }}
-      />
     </div>
   )
 }

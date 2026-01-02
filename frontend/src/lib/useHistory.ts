@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { MAX_HISTORY } from './constants'
 
 const HISTORY_KEY = 'toneo_search_history'
-const MAX_HISTORY = 20
 
 export interface HistoryItem {
   text: string

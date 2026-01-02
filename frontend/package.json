@@ -11,6 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "cnchar": "^3.2.6",
+    "cnchar-order": "^3.2.6",
+    "cnchar-radical": "^3.2.6",
     "hanzi-writer": "^3.7.3",
     "next": "^14.0.0",
     "react": "^18.2.0",

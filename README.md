@@ -110,6 +110,20 @@ Toneo automatically detects and applies:
 
 ---
 
+## Character Libraries
+
+- **hanzi-writer**: Stroke order animations and practice ([GitHub](https://github.com/chanind/hanzi-writer))
+  - Animates stroke order for any Chinese character
+  - Custom grid backgrounds (田字格, 米字格)
+  - Lightweight and focused on visualization
+
+- **cnchar**: Comprehensive Chinese character toolkit ([GitHub](https://github.com/theajack/cnchar))
+  - `cnchar-order`: Stroke names (横, 竖, 撇...) and metadata
+  - `cnchar-radical`: Character decomposition by radicals
+  - Provides educational context during stroke animations
+
+---
+
 ## Data Sources
 
 - **CC-CEDICT**: Chinese-English dictionary ([License](https://www.mdbg.net/chinese/dictionary?page=cedict))

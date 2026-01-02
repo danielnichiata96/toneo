@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef, KeyboardEvent } from 'react'
 import { PlayButton } from './PlayButton'
 import { ToneCurve } from './ToneCurve'
-import { HanziWriterCompact } from './HanziWriter'
+import { HanziWriterCompact } from './HanziWriterCompact'
 import { BrushIcon, ToneIcon, DictionaryIcon } from './icons'
 import { lookupWord } from '@/lib/api'
 import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors'

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
@@ -9,10 +9,9 @@ import { ToneVisualizer } from '@/components/ToneVisualizer'
 import { QuickExamples } from '@/components/QuickExamples'
 import { ToneLegend } from '@/components/ToneLegend'
 import { SearchHistory } from '@/components/SearchHistory'
-import { analyzeText } from '@/lib/api'
+import { useAnalyzeText } from '@/lib/useAnalyzeText'
 import { useHistory } from '@/lib/useHistory'
 import { UI } from '@/lib/i18n'
-import type { AnalyzeResponse } from '@/types/tone'
 
 export default function Home() {
   return (
@@ -45,50 +44,35 @@ function HomeContent() {
   const router = useRouter()
   const { history, addToHistory, clearHistory, removeFromHistory } = useHistory()
 
-  const [text, setText] = useState('')
-  const [result, setResult] = useState<AnalyzeResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const handleSuccess = useCallback((inputText: string) => {
+    addToHistory(inputText)
+    // Update URL without navigation
+    const url = new URL(window.location.href)
+    url.searchParams.set('text', inputText)
+    router.replace(url.pathname + url.search, { scroll: false })
+  }, [addToHistory, router])
+
+  const { text, setText, result, loading, error, analyze } = useAnalyzeText({
+    onSuccess: handleSuccess,
+  })
 
   // Handle URL param on mount
   useEffect(() => {
     const urlText = searchParams.get('text')
     if (urlText) {
       setText(urlText)
-      handleAnalyze(urlText)
+      analyze(urlText)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAnalyze = useCallback(async (inputText: string) => {
-    if (!inputText.trim()) return
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      const data = await analyzeText(inputText)
-      setResult(data)
-      addToHistory(inputText)
-
-      // Update URL without navigation
-      const url = new URL(window.location.href)
-      url.searchParams.set('text', inputText)
-      router.replace(url.pathname + url.search, { scroll: false })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : UI.errorAnalysisFailed)
-    } finally {
-      setLoading(false)
-    }
-  }, [addToHistory, router])
-
   const handleExampleClick = (example: string) => {
     setText(example)
-    handleAnalyze(example)
+    analyze(example)
   }
 
   const handleHistorySelect = (historyText: string) => {
     setText(historyText)
-    handleAnalyze(historyText)
+    analyze(historyText)
   }
 
   return (
@@ -155,7 +139,7 @@ function HomeContent() {
                 <TextInput
                   value={text}
                   onChange={setText}
-                  onAnalyze={handleAnalyze}
+                  onAnalyze={analyze}
                   loading={loading}
                 />
               </div>
