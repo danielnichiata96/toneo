@@ -26,6 +26,7 @@ export function HanziWriterCompact({
 }: HanziWriterCompactProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const writerRef = useRef<HanziWriterLib | null>(null)
+  const animateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (!containerRef.current || !character) return
@@ -44,8 +45,8 @@ export function HanziWriterCompact({
         delayBetweenStrokes: HANZI_ANIMATION.delayBetweenStrokesFast,
       })
 
-      // Auto-animate on load
-      setTimeout(() => {
+      // Auto-animate on load (with cleanup)
+      animateTimeoutRef.current = setTimeout(() => {
         writerRef.current?.animateCharacter()
       }, 300)
     } catch {
@@ -53,6 +54,10 @@ export function HanziWriterCompact({
     }
 
     return () => {
+      if (animateTimeoutRef.current) {
+        clearTimeout(animateTimeoutRef.current)
+        animateTimeoutRef.current = null
+      }
       if (containerRef.current) {
         containerRef.current.innerHTML = ''
       }

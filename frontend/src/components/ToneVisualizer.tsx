@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { ToneCard } from './ToneCard'
 import { DictionaryDrawer } from './DictionaryDrawer'
 import { UI } from '@/lib/i18n'
@@ -15,6 +15,17 @@ interface ToneVisualizerProps {
  */
 export function ToneVisualizer({ words }: ToneVisualizerProps) {
   const [selectedWord, setSelectedWord] = useState<string | null>(null)
+
+  // Single-pass stats calculation: O(n) instead of O(3n)
+  const stats = useMemo(() => {
+    let syllables = 0, sandhi = 0, hsk = 0
+    for (const w of words) {
+      syllables += w.syllables.length
+      if (w.has_sandhi) sandhi++
+      if (w.hsk_level > 0) hsk++
+    }
+    return { syllables, sandhi, hsk }
+  }, [words])
 
   const handleDictionaryClick = useCallback((word: string) => {
     setSelectedWord(word)
@@ -60,18 +71,9 @@ export function ToneVisualizer({ words }: ToneVisualizerProps) {
           {/* Summary stats */}
           <div className="mt-8 flex flex-wrap gap-3 border-t border-mao-black pt-6">
             <StatBadge label={UI.statsWords} value={words.length} />
-            <StatBadge
-              label={UI.statsSyllables}
-              value={words.reduce((acc, w) => acc + w.syllables.length, 0)}
-            />
-            <StatBadge
-              label={UI.statsSandhi}
-              value={words.filter(w => w.has_sandhi).length}
-            />
-            <StatBadge
-              label={UI.statsHsk}
-              value={words.filter(w => w.hsk_level > 0).length}
-            />
+            <StatBadge label={UI.statsSyllables} value={stats.syllables} />
+            <StatBadge label={UI.statsSandhi} value={stats.sandhi} />
+            <StatBadge label={UI.statsHsk} value={stats.hsk} />
           </div>
         </>
       )}

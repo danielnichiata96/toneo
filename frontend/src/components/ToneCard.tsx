@@ -142,7 +142,7 @@ function SyllableCard({ syllable, originalTone }: SyllableCardProps) {
 
       {/* Tone curve */}
       <div className="h-10 w-full bg-mao-white border border-mao-black flex items-center justify-center">
-        <ToneCurve tone={syllable.tone as ToneNumber} size="sm" />
+        <ToneCurve tone={syllable.tone} size="sm" />
       </div>
 
       {/* Tone number (only show if no sandhi change, to avoid duplication) */}
