@@ -1,0 +1,11 @@
+# Toneo - Chinese Tone Learning App
+# https://toneo.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://toneo.vercel.app/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
