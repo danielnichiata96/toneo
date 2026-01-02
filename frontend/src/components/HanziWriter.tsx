@@ -121,26 +121,14 @@ export function HanziWriter({
       </div>
 
       {/* Controls */}
-      <div className="flex gap-2 flex-wrap justify-center">
-        <button
-          onClick={handleAnimate}
-          disabled={isPlaying}
-          className="px-3 py-1 text-xs font-bold uppercase tracking-wider border border-mao-black bg-mao-cream hover:bg-mao-yellow disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
+      <div className="flex flex-wrap justify-center gap-2">
+        <button onClick={handleAnimate} disabled={isPlaying} className="brutal-button-sm">
           {isPlaying ? 'Playing...' : 'Animate'}
         </button>
-        <button
-          onClick={handleShowStrokes}
-          disabled={isPlaying}
-          className="px-3 py-1 text-xs font-bold uppercase tracking-wider border border-mao-black bg-mao-cream hover:bg-mao-yellow disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
+        <button onClick={handleShowStrokes} disabled={isPlaying} className="brutal-button-sm">
           Show
         </button>
-        <button
-          onClick={handleHide}
-          disabled={isPlaying}
-          className="px-3 py-1 text-xs font-bold uppercase tracking-wider border border-mao-black bg-mao-cream hover:bg-mao-yellow disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
+        <button onClick={handleHide} disabled={isPlaying} className="brutal-button-sm">
           Hide
         </button>
       </div>
