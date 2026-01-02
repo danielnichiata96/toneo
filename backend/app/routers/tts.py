@@ -73,7 +73,9 @@ async def tts_synthesize(request: Request, tts_request: TTSRequest) -> Response:
             volume=tts_request.volume,
         )
     except Exception as e:
-        logger.exception("TTS synthesis failed")
+        # Log truncated text preview (max 20 chars) to avoid logging user content
+        text_preview = tts_request.text[:20] + "..." if len(tts_request.text) > 20 else tts_request.text
+        logger.exception("TTS synthesis failed (len=%d): %s", len(tts_request.text), text_preview)
         raise HTTPException(
             status_code=500,
             detail="Speech synthesis failed. Please try again."

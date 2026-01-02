@@ -74,6 +74,14 @@ function generateJsonLd(entry: NonNullable<Awaited<ReturnType<typeof lookupWordS
   };
 }
 
+// Escape JSON for safe embedding in <script> tags (prevents XSS via </script>)
+function safeJsonLd(data: object): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+}
+
 export default async function DictionaryPage({ params }: Props) {
   const { word } = await params;
   const decodedWord = decodeURIComponent(word);
@@ -87,10 +95,10 @@ export default async function DictionaryPage({ params }: Props) {
 
   return (
     <>
-      {/* JSON-LD for SEO */}
+      {/* JSON-LD for SEO (escaped to prevent XSS) */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
 
       <main className="min-h-screen bg-mao-cream">

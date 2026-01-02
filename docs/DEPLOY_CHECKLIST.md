@@ -104,16 +104,28 @@ cd frontend && vercel --prod
 
 ---
 
-## 5. Segurança - TODOs
+## 5. Segurança
 
-### Crítico (antes de escalar)
+### ✅ Implementado
+| Item | Onde |
+|------|------|
+| Rate limiting TTS (30/min) | `backend/app/routers/tts.py` |
+| Rate limiting Analyze (60/min) | `backend/app/routers/analyze.py` |
+| Proxy IP validation | `backend/app/core/rate_limit.py` |
+| JSON-LD XSS escape | `frontend/src/app/dict/[word]/page.tsx` |
+| Log truncation (20 chars max) | Routers |
+| Text length limit (200 chars TTS) | `backend/app/routers/tts.py` |
+| Generic error messages | All routers |
+| CORS prod config | `backend/app/core/config.py` |
+
+### ❌ TODO (antes de escalar)
 | Item | Status | Onde |
 |------|--------|------|
 | TTS auth por usuário | ❌ TODO | `backend/app/routers/tts.py` |
 | Per-user quotas | ❌ TODO | Supabase + middleware |
 | TTS cache em R2 | ❌ TODO | `backend/app/services/tts.py` |
 
-### Médio (pode esperar)
+### ❌ TODO (pode esperar)
 | Item | Status | Onde |
 |------|--------|------|
 | Signed TTS URLs | ❌ TODO | R2 presigned URLs |
