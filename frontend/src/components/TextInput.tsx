@@ -15,20 +15,24 @@ interface TextInputProps {
  * Text input for Chinese text.
  */
 export function TextInput({ value, onChange, onAnalyze, loading = false }: TextInputProps) {
+  // Check if submission is valid and execute
+  const submitIfValid = useCallback(() => {
+    const trimmed = value.trim()
+    if (trimmed && !loading) {
+      onAnalyze(trimmed)
+    }
+  }, [value, loading, onAnalyze])
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (value.trim() && !loading) {
-      onAnalyze(value.trim())
-    }
+    submitIfValid()
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // Ctrl+Enter or Cmd+Enter to submit
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault()
-      if (value.trim() && !loading) {
-        onAnalyze(value.trim())
-      }
+      submitIfValid()
     }
   }
 

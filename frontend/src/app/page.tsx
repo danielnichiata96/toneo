@@ -65,15 +65,11 @@ function HomeContent() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleExampleClick = (example: string) => {
-    setText(example)
-    analyze(example)
-  }
-
-  const handleHistorySelect = (historyText: string) => {
-    setText(historyText)
-    analyze(historyText)
-  }
+  // Unified handler for selecting text from examples or history
+  const handleTextSelect = useCallback((selectedText: string) => {
+    setText(selectedText)
+    analyze(selectedText)
+  }, [setText, analyze])
 
   return (
     <main className="page-shell min-h-screen">
@@ -154,7 +150,7 @@ function HomeContent() {
                 <div className="mt-4 pt-4 border-t border-mao-black/10">
                   <SearchHistory
                     history={history}
-                    onSelect={handleHistorySelect}
+                    onSelect={handleTextSelect}
                     onRemove={removeFromHistory}
                     onClear={clearHistory}
                   />
@@ -168,7 +164,7 @@ function HomeContent() {
                 <span className="chip">{UI.examplesBadge}</span>
               </div>
               <div className="mt-4">
-                <QuickExamples onExampleClick={handleExampleClick} />
+                <QuickExamples onExampleClick={handleTextSelect} />
               </div>
             </div>
           </div>

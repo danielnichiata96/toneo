@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { synthesizeSpeech } from '@/lib/api'
 
 interface PlayButtonProps {
@@ -24,6 +24,19 @@ export function PlayButton({
   const [status, setStatus] = useState<'idle' | 'loading' | 'playing' | 'error'>('idle')
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const urlRef = useRef<string | null>(null)
+  const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Helper to set error status with auto-reset, cancellable on unmount
+  const setErrorWithReset = useCallback(() => {
+    setStatus('error')
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current)
+    }
+    errorTimeoutRef.current = setTimeout(() => {
+      errorTimeoutRef.current = null
+      setStatus('idle')
+    }, 2000)
+  }, [])
 
   const sizeClasses = {
     sm: 'w-7 h-7',
@@ -72,8 +85,7 @@ export function PlayButton({
       }
 
       audio.onerror = () => {
-        setStatus('error')
-        setTimeout(() => setStatus('idle'), 2000)
+        setErrorWithReset()
       }
 
       setStatus('playing')
@@ -81,13 +93,27 @@ export function PlayButton({
 
     } catch (error) {
       console.error('TTS error:', error)
-      setStatus('error')
-      setTimeout(() => setStatus('idle'), 2000)
+      setErrorWithReset()
     }
-  }, [text, voice, rate, status])
+  }, [text, voice, rate, status, setErrorWithReset])
 
-  // Cleanup on unmount
-  // useEffect cleanup would be better but keeping it simple
+  // Cleanup on unmount: cancel timeout, revoke Object URL, stop audio
+  useEffect(() => {
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current)
+        errorTimeoutRef.current = null
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current)
+        urlRef.current = null
+      }
+    }
+  }, [])
 
   return (
     <button

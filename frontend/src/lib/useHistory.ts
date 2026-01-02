@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { MAX_HISTORY } from './constants'
+import { safeStorage } from './safeStorage'
 
 const HISTORY_KEY = 'toneo_search_history'
 
@@ -18,14 +19,7 @@ export function useHistory() {
 
   // Load history from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(HISTORY_KEY)
-      if (stored) {
-        setHistory(JSON.parse(stored))
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
+    setHistory(safeStorage.get<HistoryItem[]>(HISTORY_KEY, []))
   }, [])
 
   // Add item to history
@@ -33,22 +27,14 @@ export function useHistory() {
     if (!text.trim()) return
 
     setHistory((prev) => {
-      // Remove duplicates
+      // Remove duplicates and add new item at the beginning
       const filtered = prev.filter((item) => item.text !== text)
-
-      // Add new item at the beginning
       const updated = [
         { text, timestamp: Date.now() },
         ...filtered,
       ].slice(0, MAX_HISTORY)
 
-      // Save to localStorage
-      try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated))
-      } catch {
-        // Ignore localStorage errors
-      }
-
+      safeStorage.set(HISTORY_KEY, updated)
       return updated
     })
   }, [])
@@ -56,22 +42,14 @@ export function useHistory() {
   // Clear history
   const clearHistory = useCallback(() => {
     setHistory([])
-    try {
-      localStorage.removeItem(HISTORY_KEY)
-    } catch {
-      // Ignore localStorage errors
-    }
+    safeStorage.remove(HISTORY_KEY)
   }, [])
 
   // Remove single item
   const removeFromHistory = useCallback((text: string) => {
     setHistory((prev) => {
       const updated = prev.filter((item) => item.text !== text)
-      try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated))
-      } catch {
-        // Ignore localStorage errors
-      }
+      safeStorage.set(HISTORY_KEY, updated)
       return updated
     })
   }, [])

@@ -2,8 +2,9 @@
 
 import { ToneCurve } from './ToneCurve'
 import { PlayButton } from './PlayButton'
+import { FrequencyIndicator } from './FrequencyIndicator'
 import { DictionaryIcon } from './icons'
-import { getToneColor, getHskColor, getContrastColor, getFrequencyInfo, getFrequencyTier } from '@/lib/colors'
+import { getToneColor, getHskColor, getContrastColor } from '@/lib/colors'
 import { UI } from '@/lib/i18n'
 import type { WordTone, SyllableInfo, ToneNumber } from '@/types/tone'
 
@@ -17,9 +18,6 @@ interface ToneCardProps {
  */
 export function ToneCard({ word, onDictionaryClick }: ToneCardProps) {
   const showHsk = word.hsk_level > 0
-  const freqTier = getFrequencyTier(word.frequency)
-  const freqInfo = getFrequencyInfo(word.frequency)
-  const freqLabel = UI.frequencyLabels[freqTier] || freqTier
 
   return (
     <article className="tone-card group" role="article">
@@ -33,26 +31,7 @@ export function ToneCard({ word, onDictionaryClick }: ToneCardProps) {
         </div>
         <div className="flex items-center gap-2">
           {/* Frequency indicator */}
-          {word.frequency !== null && freqInfo.bars > 0 && (
-            <span
-              className="flex items-center gap-1.5 rounded-full border border-mao-black/10 bg-mao-cream/50 px-2 py-1"
-              title={`${freqLabel} (Zipf: ${word.frequency})`}
-            >
-              <span className="text-[10px] font-medium text-mao-black/50 uppercase">{UI.frequencyShort}</span>
-              <span className="flex items-end gap-0.5">
-                {[1, 2, 3, 4].map((bar) => (
-                  <span
-                    key={bar}
-                    className="w-1 rounded-sm"
-                    style={{
-                      height: `${bar * 3 + 2}px`,
-                      backgroundColor: bar <= freqInfo.bars ? freqInfo.color : '#D4D4D4',
-                    }}
-                  />
-                ))}
-              </span>
-            </span>
-          )}
+          <FrequencyIndicator zipf={word.frequency} size="sm" />
           {/* HSK badge */}
           {showHsk && (
             <span

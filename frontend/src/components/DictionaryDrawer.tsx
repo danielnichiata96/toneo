@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback, useRef, KeyboardEvent } from 'react'
 import { PlayButton } from './PlayButton'
 import { ToneCurve } from './ToneCurve'
 import { HanziWriterCompact } from './HanziWriterCompact'
+import { FrequencyIndicator } from './FrequencyIndicator'
 import { BrushIcon, ToneIcon, DictionaryIcon } from './icons'
 import { lookupWord } from '@/lib/api'
-import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors'
+import { getToneColor, getHskColor, getContrastColor } from '@/lib/colors'
 import { UI } from '@/lib/i18n'
 import type { DictionaryEntry, ToneNumber } from '@/types/tone'
 
@@ -104,10 +105,6 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
 
   if (!word) return null
 
-  const freqTier = entry?.frequency_tier || 'unknown'
-  const freqInfo = FREQUENCY_TIERS[freqTier as keyof typeof FREQUENCY_TIERS] || FREQUENCY_TIERS.unknown
-  const freqLabel = UI.frequencyLabels[freqTier] || freqTier
-
   return (
     <>
       {/* Backdrop */}
@@ -198,26 +195,7 @@ export function DictionaryDrawer({ word, onClose, onWordClick }: DictionaryDrawe
                 )}
 
                 {/* Frequency badge */}
-                {entry.frequency !== null && (
-                  <span
-                    className="flex items-center gap-1.5 rounded-full border border-mao-black/10 bg-mao-cream/50 px-3 py-1"
-                    title={`Zipf: ${entry.frequency}`}
-                  >
-                    <span className="text-xs font-medium text-mao-black/60">{freqLabel}</span>
-                    <span className="flex items-end gap-0.5">
-                      {[1, 2, 3, 4].map((bar) => (
-                        <span
-                          key={bar}
-                          className="w-1 rounded-sm"
-                          style={{
-                            height: `${bar * 3 + 2}px`,
-                            backgroundColor: bar <= freqInfo.bars ? freqInfo.color : '#D4D4D4',
-                          }}
-                        />
-                      ))}
-                    </span>
-                  </span>
-                )}
+                <FrequencyIndicator zipf={entry.frequency} size="md" showLabel="full" className="px-3" />
               </div>
 
               {/* Tone breakdown */}

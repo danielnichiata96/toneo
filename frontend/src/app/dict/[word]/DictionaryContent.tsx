@@ -3,8 +3,8 @@
 import { PlayButton } from '@/components/PlayButton';
 import { ToneCurve } from '@/components/ToneCurve';
 import { HanziWriterCompact } from '@/components/HanziWriterCompact';
-import { getToneColor, getHskColor, getContrastColor, FREQUENCY_TIERS } from '@/lib/colors';
-import { UI } from '@/lib/i18n';
+import { FrequencyIndicator } from '@/components/FrequencyIndicator';
+import { getToneColor, getHskColor, getContrastColor } from '@/lib/colors';
 import type { DictionaryEntry, ToneNumber } from '@/types/tone';
 
 interface Props {
@@ -12,10 +12,6 @@ interface Props {
 }
 
 export function DictionaryContent({ entry }: Props) {
-  const freqTier = entry.frequency_tier || 'unknown';
-  const freqInfo = FREQUENCY_TIERS[freqTier as keyof typeof FREQUENCY_TIERS] || FREQUENCY_TIERS.unknown;
-  const freqLabel = UI.frequencyLabels[freqTier] || freqTier;
-
   return (
     <article className="space-y-6">
       {/* Main word header */}
@@ -53,26 +49,12 @@ export function DictionaryContent({ entry }: Props) {
             </span>
           )}
 
-          {entry.frequency !== null && (
-            <span
-              className="flex items-center gap-2 px-3 py-1 bg-mao-cream border border-mao-black/20"
-              title={`Zipf frequency: ${entry.frequency.toFixed(1)}`}
-            >
-              <span className="text-sm font-medium text-mao-black/70">{freqLabel}</span>
-              <span className="flex items-end gap-0.5">
-                {[1, 2, 3, 4].map((bar) => (
-                  <span
-                    key={bar}
-                    className="w-1.5 rounded-sm"
-                    style={{
-                      height: `${bar * 4 + 4}px`,
-                      backgroundColor: bar <= freqInfo.bars ? freqInfo.color : '#D4D4D4',
-                    }}
-                  />
-                ))}
-              </span>
-            </span>
-          )}
+          <FrequencyIndicator
+            zipf={entry.frequency}
+            size="lg"
+            showLabel="full"
+            className="px-3 py-1 rounded-none border-mao-black/20"
+          />
         </div>
       </div>
 
