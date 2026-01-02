@@ -953,34 +953,64 @@ Visit → Analyze (>60%) → Return (>30%) → Share (>5%)
 
 ## 10. Roadmap
 
-### Q1 2025 - MVP Launch
-- [x] Core analyzer
-- [x] Dictionary drawer
-- [x] TTS playback
-- [x] Mobile responsive
-- [ ] Deploy (Vercel + Railway)
-- [ ] Landing page
-- [ ] Basic analytics
+### 10.1 MVP (Lançar Agora) ✅
 
-### Q2 2025 - ToneKani Alpha
-- [ ] Single Tone Quiz (Lvl 1-3)
-- [ ] Tone Pair SRS engine (SM-2)
-- [ ] Propaganda feedback UI
-- [ ] Daily Drill + Streak
-- [x] Hanzi Writer + cnchar integration
+**Posicionamento:** Dicionário moderno com visualização de tons
 
-### Q3 2025 - ToneKani Beta
-- [ ] Full 20 Tone Pairs curriculum
-- [ ] Record & Compare (pitch overlay)
-- [ ] User accounts + progress sync
-- [ ] Fish Speech integration
-- [x] Character decomposition
+| Feature | Status | Notas |
+|---------|--------|-------|
+| Core analyzer | ✅ | Segmentação + tons + sandhi |
+| Dictionary drawer | ✅ | Lookup com definições |
+| TTS playback | ✅ | Azure Speech |
+| Tone curves SVG | ✅ | Visualização dos 5 tons |
+| HSK tags | ✅ | HSK 3.0 (1-6 + 7-9) |
+| Stroke order | ✅ | cnchar + HanziWriter |
+| Mobile responsive | ✅ | 320px+ |
+| SEO pages `/dict/[word]` | ✅ | Metadata + JSON-LD |
+| Sitemap | ✅ | 1249 palavras HSK 1-2 |
+| Rate limiting | ✅ | 30 req/min TTS |
+| Deploy frontend | ✅ | toneo.vercel.app |
+| Deploy backend | ⏳ | Railway (próximo passo) |
 
-### Q4 2025 - Launch & Monetize
-- [ ] Premium tier ("Party Member")
-- [ ] Voice cloning feature
-- [ ] Mobile PWA optimization
-- [ ] Community features
+**Fora do MVP (cortes):**
+- ❌ Quiz/Drill (vai para Phase 2)
+- ❌ Auth/Login (vai para Phase 2)
+- ❌ Gamification (vai para Phase 2)
+- ❌ Billing (vai para Phase 3)
+
+### 10.2 Phase 2 - ToneKani Alpha
+
+**Foco:** Adicionar jornada de aprendizado
+
+| Feature | Prioridade | Descrição |
+|---------|------------|-----------|
+| Supabase Auth | P0 | Login Google/Magic Link |
+| Single Tone Quiz | P0 | Lvl 1-3, identificar tons |
+| Dashboard básico | P0 | Progresso + streak |
+| Tone Pair SRS | P1 | SM-2 para 20 combinações |
+| Daily Drill | P1 | 5 min/dia |
+| TTS cache R2 | P1 | Reduzir custo Azure |
+| Propaganda feedback | P2 | UI "批准/拒绝" |
+| Métricas (PostHog) | P2 | Funil + retenção |
+
+### 10.3 Phase 3 - Monetização
+
+| Feature | Prioridade | Descrição |
+|---------|------------|-----------|
+| Paywall | P0 | Após Lvl 1-3 |
+| Pro Lifetime | P0 | $29-49 one-time |
+| Per-user quotas | P0 | TTS limits free vs pro |
+| Stripe/Lemon | P1 | Checkout |
+| Record & Compare | P1 | Pitch overlay |
+
+### 10.4 Phase 4 - Escala
+
+| Feature | Prioridade | Descrição |
+|---------|------------|-----------|
+| Voice cloning | P2 | Fish Speech |
+| Full 20 Tone Pairs | P1 | Currículo completo |
+| Community | P2 | Listas compartilháveis |
+| Mobile PWA | P2 | Offline support |
 
 ---
 
