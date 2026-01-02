@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { analyzeText } from './api'
+import { detectInputType } from './pinyinToHanzi'
 import { UI } from './i18n'
 import type { AnalyzeResponse } from '@/types/tone'
 
@@ -32,6 +33,23 @@ export function useAnalyzeText(options: UseAnalyzeTextOptions = {}): UseAnalyzeT
 
   const analyze = useCallback(async (inputText: string) => {
     if (!inputText.trim()) return
+
+    // Validate input type before calling API
+    const inputType = detectInputType(inputText)
+
+    if (inputType === 'invalid') {
+      setError(UI.errorInvalidInput)
+      setResult(null)
+      return
+    }
+
+    // For pinyin input, don't call API - let PinyinSuggestions handle it
+    // User will click a suggestion which triggers analyze with hanzi
+    if (inputType === 'pinyin') {
+      setResult(null)
+      setError(null)
+      return
+    }
 
     setLoading(true)
     setError(null)

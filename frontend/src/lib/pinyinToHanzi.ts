@@ -63,6 +63,30 @@ const VALID_PINYIN_SYLLABLES = new Set([
   'wa', 'wo', 'wai', 'wei', 'wan', 'wen', 'wang', 'weng', 'wu',
 ])
 
+export type InputType = 'chinese' | 'pinyin' | 'mixed' | 'invalid'
+
+/**
+ * Detect input type: Chinese characters, pinyin, mixed, or invalid (English/other).
+ */
+export function detectInputType(text: string): InputType {
+  if (!text.trim()) return 'invalid'
+
+  const hasChinese = /[\u4e00-\u9fff]/.test(text)
+  const hasLatin = /[a-zA-Z]/.test(text)
+
+  // Pure Chinese or Chinese with numbers/punctuation
+  if (hasChinese && !hasLatin) return 'chinese'
+
+  // Mixed: Chinese + Latin (e.g., "你好hello" or annotations)
+  if (hasChinese && hasLatin) return 'mixed'
+
+  // No Chinese, check if it's valid pinyin
+  if (isRomanized(text)) return 'pinyin'
+
+  // Latin text that isn't valid pinyin = invalid (English, etc.)
+  return 'invalid'
+}
+
 /**
  * Detect if text looks like pinyin (romanized Chinese).
  * Uses explicit syllable list to avoid false positives with English.

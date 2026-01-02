@@ -74,6 +74,8 @@ export const UI = {
 
   // Errors
   errorAnalysisFailed: 'Analysis failed',
+  errorInvalidInput: 'Please enter Chinese characters (你好) or pinyin (nihao)',
+  errorInvalidInputHint: 'This doesn\'t look like Chinese text',
 } as const
 
 export const EXAMPLES = [
