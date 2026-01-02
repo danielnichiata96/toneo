@@ -40,3 +40,5 @@ htmlcov/
 
 # Claude
 .claude/
+
+.vercel

@@ -2,11 +2,13 @@
 Toneo - TTS Router
 Text-to-speech endpoints using Azure Cognitive Services.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
 from app.models.schemas import TTSRequest, VoicesResponse, VoiceInfo
-from app.services.tts import synthesize_speech, is_tts_available, clear_cache
+from app.services.tts import synthesize_speech, is_tts_available
+from app.core.rate_limit import limiter, TTS_RATE_LIMIT
+from app.core.config import settings
 
 
 router = APIRouter()
@@ -31,10 +33,12 @@ async def get_voices() -> VoicesResponse:
 
 
 @router.post("/tts")
-async def tts_synthesize(request: TTSRequest) -> Response:
+@limiter.limit(TTS_RATE_LIMIT)
+async def tts_synthesize(request: Request, tts_request: TTSRequest) -> Response:
     """
     Synthesize speech from Chinese text.
 
+    Rate limited to 30 requests per minute per IP.
     Returns MP3 audio bytes.
     """
     if not is_tts_available():
@@ -44,11 +48,11 @@ async def tts_synthesize(request: TTSRequest) -> Response:
         )
 
     audio_data = await synthesize_speech(
-        text=request.text,
-        voice=request.voice,
-        rate=request.rate,
-        pitch=request.pitch,
-        volume=request.volume,
+        text=tts_request.text,
+        voice=tts_request.voice,
+        rate=tts_request.rate,
+        pitch=tts_request.pitch,
+        volume=tts_request.volume,
     )
 
     if audio_data is None:
@@ -78,11 +82,5 @@ async def tts_health():
     }
 
 
-@router.delete("/tts/cache")
-async def tts_clear_cache():
-    """Clear TTS cache."""
-    count = await clear_cache()
-    return {
-        "status": "ok",
-        "cleared": count,
-    }
+# Cache clear endpoint removed for security
+# Use admin tools or manual cleanup if needed

@@ -11,13 +11,15 @@ class Settings(BaseSettings):
 
     # API
     api_prefix: str = "/api"
-    debug: bool = True
+    debug: bool = False  # Set to True only in .env for local dev
 
     # CORS - accepts comma-separated string or JSON list
+    # In production, set CORS_ORIGINS env var to your frontend URL
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
+        "https://toneo.vercel.app",  # Production frontend
     ]
 
     @field_validator("cors_origins", mode="before")

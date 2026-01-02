@@ -45,6 +45,10 @@ Aprender tons em mandarim é o maior obstáculo para falantes de línguas não-t
 
 O segredo do Toneo: enquanto outros apps ensinam os 5 tons separadamente, nós ensinamos as **20 combinações de tons** (1-1, 1-2, 1-3... 4-4). Isso reflete como o cérebro realmente processa a melodia do mandarim.
 
+### 1.5 Documentos Relacionados
+
+- Jornada do usuario, conversao e monetizacao: `docs/USER_JOURNEY.md`.
+
 ---
 
 ## 2. Análise Competitiva
@@ -534,15 +538,14 @@ Múltiplos "endings" baseados em performance total:
 ┌─────────────────────────────────────────────────┐
 │                   Backend                        │
 │  FastAPI + Python 3.12                          │
-│  Railway / Fly.io                               │
+│  Railway / Render                               │
 └─────────────────────────────────────────────────┘
-                        │
-          ┌─────────────┼─────────────┐
-          ▼             ▼             ▼
-    ┌──────────┐  ┌──────────┐  ┌──────────┐
-    │ CC-CEDICT│  │  Azure   │  │ wordfreq │
-    │ SQLite   │  │  Speech  │  │          │
-    └──────────┘  └──────────┘  └──────────┘
+      │             │             │          │
+      ▼             ▼             ▼          ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│ Supabase │  │    R2    │  │  Azure   │  │ CC-CEDICT│
+│ Auth+DB  │  │TTS Cache │  │  Speech  │  │ SQLite   │
+└──────────┘  └──────────┘  └──────────┘  └──────────┘
 ```
 
 ### 7.2 NLP Pipeline
@@ -604,6 +607,112 @@ CC-CEDICT requer atribuição visível. Implementação:
 2. ✅ Link para fonte (mdbg.net)
 3. ⚠️ Indicar modificações (se houver)
 4. ⚠️ ShareAlike (derivados mesma licença)
+
+### 7.4 Infra MVP (Decisões)
+
+| Componente | Decisão | Motivo |
+|------------|---------|--------|
+| Frontend | Vercel | Já em prod, TTFB baixo |
+| Backend | Railway ou Render | Deploy simples, baixo ops |
+| Auth + DB | Supabase (Postgres) | Auth pronta + sync fácil |
+| TTS Cache | Cloudflare R2 + CDN | Baixo custo e latência |
+| TTS Provider | Azure Speech | Já integrado |
+| Dictionary | SQLite local | Read-only, rápido no backend |
+
+### 7.5 Fluxos Críticos (MVP)
+
+**Login e Sync**
+- Frontend usa Supabase Auth e envia JWT ao backend.
+- Backend valida JWT via JWKS do Supabase.
+- Progresso/SRS/compras gravados no Postgres.
+
+**TTS Cache**
+- Frontend chama `POST /api/tts` com texto e voz.
+- Backend calcula hash e busca no R2.
+- Cache hit: retorna signed URL + `Cache-Control`.
+- Cache miss: gera na Azure, salva no R2, retorna URL.
+
+### 7.6 Próximo Passo (Checklist de Implementação)
+
+- Definir schema Postgres para `progress`, `purchases`, `difficult_words`.
+- Criar bucket R2 e política de acesso + CDN.
+- Implementar endpoints `POST /api/tts`, `POST /api/progress`, `GET /api/me`.
+- Configurar env vars no Vercel/Railway (Supabase, R2, Azure).
+- Ajustar frontend para Supabase Auth + chamadas com token.
+
+### 7.7 Schema Postgres (MVP)
+
+**Notas gerais**
+- Todas as tabelas usam `user_id UUID` referenciando `auth.users(id)` com `ON DELETE CASCADE`.
+- RLS ativo no Supabase; policy: `user_id = auth.uid()`.
+- Campos de datas em `timestamptz`.
+
+#### 7.7.1 `user_progress`
+
+Armazena progresso agregado por deck/nível (ex: HSK 1, Tone Pair 1-1).
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| id | uuid | PK |
+| user_id | uuid | FK → auth.users |
+| deck_id | text | Ex: `hsk1`, `tonepair-1-1` |
+| progress_percent | numeric(5,2) | 0.00–100.00 |
+| level_reached | int | Nível mais alto concluído |
+| streak_count | int | Dias seguidos (opcional) |
+| last_seen_at | timestamptz | Última interação |
+| created_at | timestamptz | Default now() |
+| updated_at | timestamptz | Default now() |
+
+**Índices**
+- `user_progress_user_id_idx` em `user_id`
+- Único: `(user_id, deck_id)`
+
+#### 7.7.2 `user_purchases`
+
+Status de compra e entitlement do usuário (Free vs Pro/Lifetime).
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| id | uuid | PK |
+| user_id | uuid | FK → auth.users |
+| product_id | text | Ex: `pro_lifetime`, `pro_monthly` |
+| status | text | `active`, `trialing`, `canceled`, `refunded` |
+| provider | text | Ex: `stripe`, `lemon` |
+| provider_ref | text | ID do provedor (opcional) |
+| purchased_at | timestamptz | Data da compra |
+| expires_at | timestamptz | Nulo para lifetime |
+| created_at | timestamptz | Default now() |
+| updated_at | timestamptz | Default now() |
+
+**Índices**
+- `user_purchases_user_id_idx` em `user_id`
+- `user_purchases_status_idx` em `status`
+
+#### 7.7.3 `user_difficult_words`
+
+Lista de palavras marcadas como difíceis para revisão futura.
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| id | uuid | PK |
+| user_id | uuid | FK → auth.users |
+| word | text | Hanzi |
+| pinyin | text | Opcional |
+| tone_pair | text | Ex: `2-3` (opcional) |
+| source | text | Ex: `deck`, `lookup` |
+| difficulty_score | int | 1–5 (opcional) |
+| last_seen_at | timestamptz | Última revisão |
+| created_at | timestamptz | Default now() |
+| updated_at | timestamptz | Default now() |
+
+**Índices**
+- `user_difficult_words_user_id_idx` em `user_id`
+- Único: `(user_id, word)`
+
+#### 7.7.4 Tabela futura (SRS detalhado)
+
+Para SM-2 real, adicionar `user_srs_items`:
+- `item_id` (palavra ou tone pair), `due_at`, `interval`, `ease_factor`, `repetitions`.
 
 ---
 
