@@ -1,15 +1,24 @@
 """
 Toneo - TTS Router
 Text-to-speech endpoints using Azure Cognitive Services.
+
+Security notes:
+- Rate limited to 30 req/min per IP (see rate_limit.py)
+- Text length capped at 200 chars to prevent abuse
+- TODO: Add user auth + per-user quotas when Supabase is integrated
 """
+import logging
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
 from app.models.schemas import TTSRequest, VoicesResponse, VoiceInfo
 from app.services.tts import synthesize_speech, is_tts_available
 from app.core.rate_limit import limiter, TTS_RATE_LIMIT
-from app.core.config import settings
 
+logger = logging.getLogger(__name__)
+
+# Max characters per TTS request (prevent abuse)
+MAX_TTS_CHARS = 200
 
 router = APIRouter()
 
@@ -39,26 +48,41 @@ async def tts_synthesize(request: Request, tts_request: TTSRequest) -> Response:
     Synthesize speech from Chinese text.
 
     Rate limited to 30 requests per minute per IP.
+    Max 200 characters per request.
     Returns MP3 audio bytes.
     """
+    # Validate text length
+    if len(tts_request.text) > MAX_TTS_CHARS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Text too long. Maximum {MAX_TTS_CHARS} characters allowed."
+        )
+
     if not is_tts_available():
         raise HTTPException(
             status_code=503,
-            detail="TTS service unavailable. Configure AZURE_SPEECH_KEY in .env"
+            detail="TTS service temporarily unavailable."
         )
 
-    audio_data = await synthesize_speech(
-        text=tts_request.text,
-        voice=tts_request.voice,
-        rate=tts_request.rate,
-        pitch=tts_request.pitch,
-        volume=tts_request.volume,
-    )
-
-    if audio_data is None:
+    try:
+        audio_data = await synthesize_speech(
+            text=tts_request.text,
+            voice=tts_request.voice,
+            rate=tts_request.rate,
+            pitch=tts_request.pitch,
+            volume=tts_request.volume,
+        )
+    except Exception as e:
+        logger.exception("TTS synthesis failed")
         raise HTTPException(
             status_code=500,
-            detail="Failed to synthesize speech"
+            detail="Speech synthesis failed. Please try again."
+        )
+
+    if audio_data is None or len(audio_data) == 0:
+        raise HTTPException(
+            status_code=500,
+            detail="Speech synthesis failed. Please try again."
         )
 
     return Response(

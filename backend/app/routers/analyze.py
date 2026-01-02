@@ -2,11 +2,13 @@
 Toneo - Analyze Router
 Text analysis endpoints.
 """
+import logging
 from fastapi import APIRouter, HTTPException
 
 from app.models.schemas import AnalyzeRequest, AnalyzeResponse
 from app.services.tone_analyzer import get_analyzer
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -26,4 +28,9 @@ async def analyze_text(request: AnalyzeRequest) -> AnalyzeResponse:
         result = analyzer.analyze_text(request.text)
         return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Log full error server-side, return generic message to client
+        logger.exception("Analysis failed for text: %s...", request.text[:50])
+        raise HTTPException(
+            status_code=500,
+            detail="Analysis failed. Please try again or contact support."
+        )

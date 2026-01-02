@@ -28,6 +28,8 @@ Thumbs.db
 # Data
 backend/data/cache/
 backend/data/*.db
+backend/data/tts_cache/
+*.mp3
 
 # Logs
 *.log
